@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:random_number/component/number_row.dart';
 import 'package:random_number/constant/color.dart';
 import 'package:random_number/screen/setting_screen.dart';
 
@@ -13,6 +14,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<int> randomNumbers = [123,456,789];
+  int maxNumber = 1000;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _Header(),
+              _Header(onPressed: onSettingsPop),
               _Body(randomNumbers: randomNumbers,),
               _Footer(buttonPressed: onRandomNumberGenerate)
             ],
@@ -34,12 +36,26 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void onSettingsPop () async {
+      final result = await Navigator.of(context).push<int>(MaterialPageRoute(builder: (BuildContext context) {
+        return SettingsScreen(maxNumber: maxNumber,);
+      }));
+
+      if(result != null) {
+        setState(() {
+          maxNumber = result;
+        });
+      }
+
+}
+
+
   /// 랜덤 난수 생성 함수
   void onRandomNumberGenerate() {
     final rand = Random();
     final Set<int> newNumbers = {};
     while(newNumbers.length != 3) {
-      newNumbers.add(rand.nextInt(1000));
+      newNumbers.add(rand.nextInt(maxNumber));
     }
     setState(() {
       randomNumbers = newNumbers.toList();
@@ -48,7 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({Key? key}) : super(key: key);
+  final VoidCallback onPressed;
+  const _Header({required this.onPressed, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -63,11 +80,8 @@ class _Header extends StatelessWidget {
               fontWeight: FontWeight.w700),
         ),
         IconButton(
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-                return SettingsScreen();
-              }));
-            },
+          // async 로 페이지 데이터를 전달 받는다.
+            onPressed: onPressed,
             // const 를 사용하면 위젯 인스턴스를 처음 한 번 생성하고
             // 그 이후에 빌드가 일어나도 처음 만들어졌던 위젯을 사용한다.
             icon: const Icon(
@@ -96,17 +110,7 @@ class _Body extends StatelessWidget {
               .entries // key, value 값을 들고 올 수 있게 해준다.
               .map((element) => Padding(
             padding: EdgeInsets.only(bottom: element.value == randomNumbers.last ? 0 : 16.0 ),
-            child: Row(
-              children: element.value
-                  .toString()
-                  .split("")
-                  .map((number) => Image.asset(
-                "asset/img/$number.png",
-                width: 50.0,
-                height: 70.0,
-              ))
-                  .toList(),
-            ),
+            child: NumberRow(number: element.value),
           ))
               .toList()),
     );
