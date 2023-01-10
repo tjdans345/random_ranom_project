@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:random_number/constant/color.dart';
+import 'package:random_number/screen/setting_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -62,7 +63,11 @@ class _Header extends StatelessWidget {
               fontWeight: FontWeight.w700),
         ),
         IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                return SettingsScreen();
+              }));
+            },
             // const 를 사용하면 위젯 인스턴스를 처음 한 번 생성하고
             // 그 이후에 빌드가 일어나도 처음 만들어졌던 위젯을 사용한다.
             icon: const Icon(
@@ -73,6 +78,8 @@ class _Header extends StatelessWidget {
     );
   }
 }
+
+
 
 class _Body extends StatelessWidget {
   final List<int> randomNumbers;
